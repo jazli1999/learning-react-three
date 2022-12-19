@@ -1,12 +1,10 @@
 import './App.css';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
-import { useState } from 'react';
-import porcelainWhite from './assets/matcap-porcelain-white.jpg';
-import { TextureLoader } from 'three';
+import { Environment, OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { BackSide } from 'three';
+import { Model } from './assets/models/tokyo/model';
 
 function App() {
-  const [size, setSize] = useState(2);
 
   const enlarge = () => {
     setSize(prev => prev + 1);
@@ -22,19 +20,26 @@ function App() {
     <div className="App">
       <button onClick={enlarge}>Enalrge</button>
       <button onClick={shrink}>Shrink</button>
-      <Canvas style={{ height: 500, width: 500 }}>
-      <directionalLight position={[1, 2, 2]} />
-        <ambientLight intensity={0.5} />
+      <Canvas style={{ height: 500, width: 500 }} shadows>
+      <spotLight args={["#ffffff", 1.5, 7, angleToRadians(45), 0.4]} position={[-3, 1, 0]} castShadow />
+        <ambientLight intensity={0.25} color="#ffffff" />
         <OrbitControls />
         <PerspectiveCamera position={[0, 6, 20]} makeDefault />
-        <mesh position={[0, 2, 0]}>
-          <sphereGeometry args={[size, 32, 32]} />
-          <ambientLight intensity={0.5} />
+        <Model />
+        <mesh position={[0, 0.5, 0]} castShadow>
+          <sphereGeometry args={[0.5, 32, 32]} />
+          <meshStandardMaterial color="#d1a652" metalness={0.6} roughness={0.2} />
         </mesh>
-        <mesh rotation={[-angleToRadians(90), 0, 0]}>
-          <planeGeometry args={[10, 10]} />
-          <meshStandardMaterial color="#fefefd" />
+        <mesh rotation={[-angleToRadians(90), 0, 0]} receiveShadow>
+          <planeGeometry args={[20, 20]} />
+          <meshStandardMaterial color="#ebebeb" />
         </mesh>
+        <Environment background>
+          <mesh>
+            <sphereGeometry args={[50, 100, 100]} />
+            <meshBasicMaterial color="#f8dda3" side={BackSide} />
+          </mesh>
+        </Environment>
       </Canvas>
     </div>
   )
